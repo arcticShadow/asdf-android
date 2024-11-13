@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+current_script_path=${BASH_SOURCE[0]}
+plugin_dir=$(dirname "$(dirname "$current_script_path")")
+
+# shellcheck source=./lib/utils.bash
+source "${plugin_dir}/lib/utils.bash"
+
+android_sdk_root=$(find_android_sdk_root)
+
+# Additional paths for platform tools and other binaries
+paths=(
+    ${android_sdk_root}/cmdline-tools/latest/bin
+)
+
+# if platform-tools installed
+if [ -d "${android_sdk_root}/platform-tools" ]; then
+    paths+=(${android_sdk_root}/platform-tools)
+fi
+
+# if tools installed
+if [ -d "${android_sdk_root}/tools" ]; then
+    paths+=(${android_sdk_root}/tools)
+    paths+=(${android_sdk_root}/tools/bin)
+fi
+
+
+export PATH="${android_sdk_root}/tools:${PATH}"
+export PATH="${android_sdk_root}/tools/bin:${PATH}"
+
+
+# Print paths space-separated
+echo "${paths[*]}"
+

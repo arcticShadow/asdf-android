@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
-
-set -euo pipefail
-
 current_script_path=${BASH_SOURCE[0]}
 plugin_dir=$(dirname "$(dirname "$current_script_path")")
 
 # shellcheck source=./lib/utils.bash
 source "${plugin_dir}/lib/utils.bash"
 
+android_sdk_root=$(find_android_sdk_root)
 
-
-install_command_line_tools "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH"
-install_additional_tools "$ASDF_INSTALL_PATH"
+export ANDROID_HOME="${android_sdk_root}"
+export ANDROID_SDK_ROOT="${android_sdk_root}"
