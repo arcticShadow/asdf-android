@@ -157,10 +157,13 @@ install_additional_tools() {
 		fi
 	done < <(env)
 
-	# Install each package using sdkmanager
-	for package in "${sdk_packages[@]}"; do
-		install_package "$package"
-	done
+	# Only install packages if there are any specified
+	if [ ${#sdk_packages[@]} -gt 0 ]; then
+		# Install each package using sdkmanager
+		for package in "${sdk_packages[@]}"; do
+			install_package "$package"
+		done
+	fi
 }
 
 get_platform() {
