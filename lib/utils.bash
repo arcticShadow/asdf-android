@@ -59,6 +59,7 @@ install_command_line_tools() {
 	local install_type="$1"
 	local version="$2"
 
+
 	local android_sdk_root=$(find_android_sdk_root)
 
 	if [ "$install_type" != "version" ]; then
@@ -85,7 +86,7 @@ install_command_line_tools() {
 		cmdlinetools_version=$($sdkmanager --list --sdk_root=$android_sdk_root | grep "cmdline-tools;latest" | awk -F'|' '{print $2}' | tr -d ' ' | head -n1)
 		
 		# install cmdline-tools
-		install_package "cmdline-tools;latest"
+		install_package $sdkmanager "cmdline-tools;latest" 
 
 		# get installed version of cmdline-tools
 		local installed_version
@@ -128,9 +129,9 @@ find_android_sdk_root() {
 }
 
 install_package() {
-	local package="$1"
+	local package="$2"
 	android_sdk_root=$(find_android_sdk_root)
-	sdkmanager="${android_sdk_root}/${ANDROID_COMMAND_LINE_TOOLS_PATH}/latest/bin/sdkmanager"
+	sdkmanager=$1
 
 	echo "* Installing Android package: $package"
 	$sdkmanager --install --sdk_root="${android_sdk_root}" $package <<< "y" 
@@ -139,7 +140,16 @@ install_package() {
 # This function is only useful when using mise - in asdf it is ignored
 install_additional_tools() {
 	local install_path="${1%/bin}/"
-	
+	local android_sdk_root=$(find_android_sdk_root)
+	local sdkmanager=""
+
+	if [ -n "$android_sdk_root" ] && [ -d "$android_sdk_root/$ANDROID_COMMAND_LINE_TOOLS_PATH/latest" ]; then
+		if [ -x "$android_sdk_root/$ANDROID_COMMAND_LINE_TOOLS_PATH/latest/bin/sdkmanager" ]; then
+			sdkmanager="$android_sdk_root/$ANDROID_COMMAND_LINE_TOOLS_PATH/latest/bin/sdkmanager"
+		fi
+	fi
+
+
 	# Get all MISE_TOOL_OPTS__ environment variables
 	local sdk_packages=()
 	while IFS='=' read -r name value; do
