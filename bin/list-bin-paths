@@ -26,10 +26,45 @@ if [ -d "${android_sdk_root}/tools" ]; then
 fi
 
 
-export PATH="${android_sdk_root}/tools:${PATH}"
-export PATH="${android_sdk_root}/tools/bin:${PATH}"
 
+##
+## Construct output
+##
 
 # Print paths space-separated
-echo "${paths[*]}"
+# Convert absolute paths to relative paths based on ASDF_INSTALL_PATH
+
+declare -a relative_paths
+for path in "${paths[@]}"; do
+  # Get the common prefix between ASDF_INSTALL_PATH and current path
+  IFS='/' read -ra path_parts <<< "$path"
+  IFS='/' read -ra install_parts <<< "$ASDF_INSTALL_PATH"
+  
+  # Find where paths diverge
+  common_length=0
+  for ((i=1; i<${#path_parts[@]} && i<${#install_parts[@]}; i++)); do
+    if [[ "${path_parts[i]}" != "${install_parts[i]}" ]]; then
+      break
+    fi
+    ((common_length++))
+  done
+  
+  # Build relative path
+  relative_path="$ASDF_INSTALL_PATH"
+  # Add "../" for each remaining component in ASDF_INSTALL_PATH
+  for ((i=common_length+1; i<${#install_parts[@]}; i++)); do
+    relative_path+="/..";
+  done
+  # Add remaining path components
+  for ((i=common_length+1; i<${#path_parts[@]}; i++)); do
+    relative_path+="/${path_parts[i]}"
+  done
+  
+  relative_paths+=("$relative_path")
+done
+
+##
+## Print output
+##
+echo "${relative_paths[*]}"
 
