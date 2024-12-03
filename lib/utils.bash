@@ -31,7 +31,7 @@ list_all_versions() {
 
 download_release() {
 	local version filename url platform android_sdk_root
-	version="$1"
+	version="11076708"
 	filename="$2"
 	
 	platform=$(get_platform)
