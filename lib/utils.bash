@@ -171,7 +171,7 @@ install_additional_tools() {
 	if [ ${#sdk_packages[@]} -gt 0 ]; then
 		# Install each package using sdkmanager
 		for package in "${sdk_packages[@]}"; do
-			install_package "$package"
+			install_package "$sdkmanager" "$package"
 		done
 	fi
 }
